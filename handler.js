@@ -1,4 +1,4 @@
-let jokes = require("./jokes/index.json");
+const jokes = require("./jokes/index.json");
 
 let lastJokeId = 0;
 jokes.forEach((jk) => (jk.id = ++lastJokeId));
@@ -51,8 +51,13 @@ const paginateJokes = (
  */
 
 const removeJoke = (jokeId) => {
-  jokes = jokes.filter((j) => j.id !== jokeId);
-  return jokes;
+  const jokeIdx = jokes.findIndex((j) => j?.id === jokeId);
+  console.log({ jokeIdx });
+  if (jokeIdx >= 0) {
+    delete jokes[jokeIdx];
+    return true;
+  }
+  return false;
 };
 
 /**

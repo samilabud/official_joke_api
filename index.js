@@ -106,8 +106,12 @@ app.get("/jokes/:id", (req, res, next) => {
 app.delete("/jokes/:id/delete", (req, res, next) => {
   try {
     const { id } = req.params;
-    const jokes = removeJoke(+id);
-    return res.json(jokes);
+    console.log({ id });
+    const wasJokeRemoved = removeJoke(+id);
+    if (!wasJokeRemoved) {
+      return next({ statusCode: 404, message: "joke not found" });
+    }
+    return res.status(200).send("Joke deleted!");
   } catch (e) {
     return next(e);
   }

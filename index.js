@@ -80,7 +80,7 @@ app.get("/jokes/:type/ten", (req, res) => {
 });
 
 app.get("/jokes/paginate/", (req, res) => {
-  const { pageSize, pageNumber, sortKey = null, sortOrder } = req.params;
+  const { pageSize, pageNumber, sortKey = null, sortOrder } = req.query;
   const validSortKeys = ["type", "setup", "punchline", "id"];
   const validSortOrders = ["asc", "desc"];
   try {

@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const LimitingMiddleware = require("limiting-middleware");
 const {
   randomJoke,
@@ -22,6 +23,7 @@ const app = express();
 
 app.use(new LimitingMiddleware().limitByIp());
 app.use(express.json());
+app.use(cors());
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");

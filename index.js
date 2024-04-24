@@ -10,6 +10,14 @@ const {
   removeJoke,
 } = require("./handler");
 
+function isNumber(value) {
+  try {
+    return !isNaN(parseInt(value));
+  } catch (err) {
+    return false;
+  }
+}
+
 const app = express();
 
 app.use(new LimitingMiddleware().limitByIp());
@@ -72,13 +80,13 @@ app.get("/jokes/:type/ten", (req, res) => {
 });
 
 app.get("/jokes/paginate/", (req, res) => {
-  const { pageSize, pageNumber, sortKey = null, sortOrder } = req.body;
+  const { pageSize, pageNumber, sortKey = null, sortOrder } = req.params;
   const validSortKeys = ["type", "setup", "punchline", "id"];
   const validSortOrders = ["asc", "desc"];
   try {
-    if (isNaN(pageSize)) {
+    if (!isNumber(pageSize)) {
       res.send("The pageSize is not a number.");
-    } else if (isNaN(pageNumber)) {
+    } else if (!isNumber(pageNumber)) {
       res.send("The pageNumber is not a number.");
     } else if (sortKey !== null && !validSortKeys.includes(sortKey)) {
       res.send(`The sortKey valids are ${validSortKeys.join(",")}.`);
@@ -106,7 +114,6 @@ app.get("/jokes/:id", (req, res, next) => {
 app.delete("/jokes/:id/delete", (req, res, next) => {
   try {
     const { id } = req.params;
-    console.log({ id });
     const wasJokeRemoved = removeJoke(+id);
     if (!wasJokeRemoved) {
       return next({ statusCode: 404, message: "joke not found" });

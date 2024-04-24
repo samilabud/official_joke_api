@@ -1,4 +1,4 @@
-const jokes = require("./jokes/index.json");
+let jokes = require("./jokes/index.json");
 
 let lastJokeId = 0;
 jokes.forEach((jk) => (jk.id = ++lastJokeId));
@@ -11,7 +11,7 @@ const randomJoke = () => {
  * Get jokes in specific order for pagination purpose
  * @param {Number} pageSize - Number of items per page
  * @param {Number} pageNumber - Page number
- * @param {String} sortKey - The key to sort the jokes "type" | "setup" | "punchline"
+ * @param {String} sortKey - The key to sort the jokes "type" | "setup" | "punchline" | "id"
  * @param {String} sortOrder - How to sort the jokes "asc" | "desc"
  * @returns an array of jokes
  */
@@ -42,6 +42,17 @@ const paginateJokes = (
   }
 
   return jokes.slice(pageNumber * pageSize, (pageNumber + 1) * pageSize);
+};
+
+/**
+ * Delete a joke from array (temporary until service restart)
+ * @param {Number} jokeId - Unique id that identifies the joke
+ * @returns an array of jokes
+ */
+
+const removeJoke = (jokeId) => {
+  jokes = jokes.filter((j) => j.id !== jokeId);
+  return jokes;
 };
 
 /**
@@ -89,4 +100,5 @@ module.exports = {
   jokeById,
   jokeByType,
   paginateJokes,
+  removeJoke,
 };

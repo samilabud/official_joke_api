@@ -1,11 +1,59 @@
-const jokes = require('./jokes/index.json');
+let jokes = require("./jokes/index.json");
 
 let lastJokeId = 0;
-jokes.forEach(jk => jk.id = ++lastJokeId);
+jokes.forEach((jk) => (jk.id = ++lastJokeId));
 
 const randomJoke = () => {
   return jokes[Math.floor(Math.random() * jokes.length)];
-}
+};
+
+/**
+ * Get jokes in specific order for pagination purpose
+ * @param {Number} pageSize - Number of items per page
+ * @param {Number} pageNumber - Page number
+ * @param {String} sortKey - The key to sort the jokes "type" | "setup" | "punchline" | "id"
+ * @param {String} sortOrder - How to sort the jokes "asc" | "desc"
+ * @returns an array of jokes
+ */
+
+const paginateJokes = (
+  pageSize,
+  pageNumber,
+  sortKey = null,
+  sortOrder = "asc"
+) => {
+  // Zero-based index for the current page slice
+  --pageNumber;
+
+  // Apply sorting if sortKey is provided
+  if (sortKey) {
+    jokes.sort((a, b) => {
+      const valueA =
+        typeof a[sortKey] === "string" ? a[sortKey].toUpperCase() : a[sortKey];
+      const valueB =
+        typeof b[sortKey] === "string" ? b[sortKey].toUpperCase() : b[sortKey];
+
+      if (sortOrder.toLowerCase() === "asc") {
+        return valueA < valueB ? -1 : valueA > valueB ? 1 : 0;
+      } else {
+        return valueA > valueB ? -1 : valueA < valueB ? 1 : 0;
+      }
+    });
+  }
+
+  return jokes.slice(pageNumber * pageSize, (pageNumber + 1) * pageSize);
+};
+
+/**
+ * Delete a joke from array (temporary until service restart)
+ * @param {Number} jokeId - Unique id that identifies the joke
+ * @returns an array of jokes
+ */
+
+const removeJoke = (jokeId) => {
+  jokes = jokes.filter((j) => j.id !== jokeId);
+  return jokes;
+};
 
 /**
  * Get N random jokes from a jokeArray
@@ -21,7 +69,7 @@ const randomN = (jokeArray, n) => {
     }
   }
 
-  return Array.from(randomIndicesSet).map(randomIndex => {
+  return Array.from(randomIndicesSet).map((randomIndex) => {
     return jokeArray[randomIndex];
   });
 };
@@ -31,13 +79,26 @@ const randomTen = () => randomN(jokes, 10);
 const randomSelect = (number) => randomN(jokes, number);
 
 const jokeByType = (type, n) => {
-  return randomN(jokes.filter(joke => joke.type === type), n);
+  return randomN(
+    jokes.filter((joke) => joke.type === type),
+    n
+  );
 };
 
-/** 
+/**
  * @param {Number} id - joke id
  * @returns a single joke object or undefined
  */
-const jokeById = (id) => (jokes.filter(jk => jk.id === id)[0]);
+const jokeById = (id) => jokes.filter((jk) => jk.id === id)[0];
 
-module.exports = { jokes, randomJoke, randomN, randomTen, randomSelect, jokeById, jokeByType };
+module.exports = {
+  jokes,
+  randomJoke,
+  randomN,
+  randomTen,
+  randomSelect,
+  jokeById,
+  jokeByType,
+  paginateJokes,
+  removeJoke,
+};

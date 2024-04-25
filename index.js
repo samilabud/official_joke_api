@@ -8,7 +8,7 @@ const {
   jokeByType,
   jokeById,
   paginateJokes,
-  removeJoke,
+  voteJoke,
 } = require("./handler");
 
 function isNumber(value) {
@@ -82,7 +82,13 @@ app.get("/jokes/:type/ten", (req, res) => {
 });
 
 app.get("/jokes/paginate/", (req, res) => {
-  const { pageSize, pageNumber, sortKey = null, sortOrder } = req.query;
+  const {
+    pageSize,
+    pageNumber,
+    sortKey = null,
+    sortOrder,
+    type = "all",
+  } = req.query;
   const validSortKeys = ["type", "setup", "punchline", "id"];
   const validSortOrders = ["asc", "desc"];
   try {
@@ -95,7 +101,7 @@ app.get("/jokes/paginate/", (req, res) => {
     } else if ((sortKey !== null) & !validSortOrders.includes(sortOrder)) {
       res.send(`The sortOrder valids are ${validSortOrders.join(",")}.`);
     } else {
-      res.json(paginateJokes(pageSize, pageNumber, sortKey, sortOrder));
+      res.json(paginateJokes(pageSize, pageNumber, sortKey, sortOrder, type));
     }
   } catch (err) {
     res.send(`Error during pagination. ${err}`);
@@ -113,14 +119,14 @@ app.get("/jokes/:id", (req, res, next) => {
   }
 });
 
-app.delete("/jokes/:id/delete", (req, res, next) => {
+app.post("/jokes/vote", (req, res, next) => {
   try {
-    const { id } = req.params;
-    const wasJokeRemoved = removeJoke(+id);
-    if (!wasJokeRemoved) {
+    const { id } = req.body;
+    const wasJokeUpdated = voteJoke(+id);
+    if (!wasJokeUpdated) {
       return next({ statusCode: 404, message: "joke not found" });
     }
-    return res.status(200).send("Joke deleted!");
+    return res.status(200).send("Joke voted!");
   } catch (e) {
     return next(e);
   }

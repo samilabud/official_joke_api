@@ -20,7 +20,8 @@ const paginateJokes = (
   pageSize,
   pageNumber,
   sortKey = null,
-  sortOrder = "asc"
+  sortOrder = "asc",
+  type = "all"
 ) => {
   // Zero-based index for the current page slice
   --pageNumber;
@@ -40,21 +41,32 @@ const paginateJokes = (
       }
     });
   }
+  let paginatedJokes = jokes;
+  if (type !== "all") {
+    paginatedJokes = paginatedJokes.filter((val) => val.type === type);
+  }
+  const result = paginatedJokes.slice(
+    pageNumber * pageSize,
+    (pageNumber + 1) * pageSize
+  );
 
-  return jokes.slice(pageNumber * pageSize, (pageNumber + 1) * pageSize);
+  return result;
 };
 
 /**
- * Delete a joke from array (temporary until service restart)
+ * Vote for a joke (temporary until service restart)
  * @param {Number} jokeId - Unique id that identifies the joke
- * @returns an array of jokes
+ * @returns Boolean - true or false if joke exists
  */
 
-const removeJoke = (jokeId) => {
+const voteJoke = (jokeId) => {
   const jokeIdx = jokes.findIndex((j) => j?.id === jokeId);
-  console.log({ jokeIdx });
   if (jokeIdx >= 0) {
-    delete jokes[jokeIdx];
+    if (jokes[jokeIdx]?.vote) {
+      jokes[jokeIdx].vote += 1;
+    } else {
+      jokes[jokeIdx].vote = 1;
+    }
     return true;
   }
   return false;
@@ -105,5 +117,5 @@ module.exports = {
   jokeById,
   jokeByType,
   paginateJokes,
-  removeJoke,
+  voteJoke,
 };

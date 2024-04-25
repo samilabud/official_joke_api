@@ -119,14 +119,14 @@ app.get("/jokes/:id", (req, res, next) => {
   }
 });
 
-app.post("/jokes/vote", (req, res, next) => {
+app.post("/jokes/:id/vote", (req, res, next) => {
   try {
-    const { id } = req.body;
-    const wasJokeUpdated = voteJoke(+id);
-    if (!wasJokeUpdated) {
+    const { id } = req.params;
+    const numOfVotes = voteJoke(+id);
+    if (!numOfVotes) {
       return next({ statusCode: 404, message: "joke not found" });
     }
-    return res.status(200).send("Joke voted!");
+    return res.status(200).json(numOfVotes);
   } catch (e) {
     return next(e);
   }

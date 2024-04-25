@@ -62,12 +62,12 @@ const paginateJokes = (
 const voteJoke = (jokeId) => {
   const jokeIdx = jokes.findIndex((j) => j?.id === jokeId);
   if (jokeIdx >= 0) {
-    if (jokes[jokeIdx]?.vote) {
-      jokes[jokeIdx].vote += 1;
+    if (jokes[jokeIdx]?.votes) {
+      jokes[jokeIdx].votes += 1;
     } else {
-      jokes[jokeIdx].vote = 1;
+      jokes[jokeIdx].votes = 1;
     }
-    return true;
+    return jokes[jokeIdx].votes;
   }
   return false;
 };
